@@ -1,49 +1,69 @@
 import random
 import math
 
-def generateRandomValue(minValue, maxValue):
-  return random.uniform(minValue, maxValue)
+def hill_climbing(objective, minArray, maxArray, maxFailedAttempts):
+  def generateRandomSolution():
+    randomSolution = []
+    for i in range(len(minArray)):
+      randomSolution.append(random.uniform(minArray[i], maxArray[i]))
+    return randomSolution
 
-def generateRandomSolution(minArray, maxArray):
-  return [generateRandomValue(minArray[0], maxArray[0]), generateRandomValue(minArray[1], maxArray[1])]
+  def printSolution(title, solution):
+    x, y = solution
+    print(title)
+    print('f(', x, ', ', y, ') = ', objective(solution))
 
-def calculateSolutionValue(solution):
-  x = solution[0]
-  y = solution[1]
+  solution = generateRandomSolution()
+  bestSolution = solution
+  bestObjectiveValue = objective(bestSolution)
+
+  printSolution('Initial solution', solution)
+
+  failedAttempts = 0
+
+  while (True):
+    solution = generateRandomSolution()
+    objectiveValue = objective(solution)
+
+    if objectiveValue < bestObjectiveValue:
+      bestSolution = solution
+      bestObjectiveValue = objectiveValue
+      failedAttempts = 0
+
+    if objectiveValue >= bestObjectiveValue:
+      failedAttempts += 1
+      if failedAttempts == maxFailedAttempts:
+        break
+
+  printSolution('Best solution', bestSolution)
+  print()
+
+def objectiveOne(solution):
+  x, y = solution
   return math.sin(x + y) + math.pow((x - y), 2) - (1.5 * x) + (2.5 * y) + 1
 
-def printSolution(title, solution):
-  print(title)
-  print('-----------------------')
-  print('x = ', solution[0])
-  print('y =', solution[1])
-  print('Result =', calculateSolutionValue(solution), '\n')
+def objectiveTwo(solution):
+  x, y = solution
+  return ((-1 * (y + 47)) * math.sin(math.sqrt(abs((x / 2) + y + 47)))) - (x * math.sin(math.sqrt(abs(x - y - 47))))
 
-min = [-1.5, -3]
-max = [4, 4]
-
-initialSolution = generateRandomSolution(min, max)
-solution = initialSolution
-bestSolution = solution
-bestSolutionValue = calculateSolutionValue(bestSolution)
-
-printSolution('Initial solution', solution)
-
-failedAttempts = 0
 maxFailedAttempts = 100000
 
-while (True):
-  solution = generateRandomSolution(min, max)
-  solutionValue = calculateSolutionValue(solution)
+minArray = [-1.5, -3]
+maxArray = [4, 4]
 
-  if solutionValue < bestSolutionValue:
-    bestSolution = solution
-    bestSolutionValue = solutionValue
-    failedAttempts = 0
+hill_climbing(objectiveOne, minArray, maxArray, maxFailedAttempts)
 
-  if solutionValue >= bestSolutionValue:
-    failedAttempts += 1
-    if failedAttempts == maxFailedAttempts:
-      break
+minArray = [-512, -512]
+maxArray = [512, 512]
 
-printSolution('Best solution', bestSolution)
+hill_climbing(objectiveOne, minArray, maxArray, maxFailedAttempts)
+
+minArray = [-1, -2]
+maxArray = [0, -1]
+
+hill_climbing(objectiveOne, minArray, maxArray, maxFailedAttempts)
+
+minArray = [511, 404]
+maxArray = [512, 405]
+
+hill_climbing(objectiveOne, minArray, maxArray, maxFailedAttempts)
