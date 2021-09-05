@@ -29,11 +29,21 @@ bestSolutionValue = calculateSolutionValue(bestSolution)
 
 printSolution('Initial solution', solution)
 
-for i in range(5):
+failedAttempts = 0
+maxFailedAttempts = 100000
+
+while (True):
   solution = generateRandomSolution(min, max)
   solutionValue = calculateSolutionValue(solution)
+
   if solutionValue < bestSolutionValue:
     bestSolution = solution
     bestSolutionValue = solutionValue
+    failedAttempts = 0
+
+  if solutionValue >= bestSolutionValue:
+    failedAttempts += 1
+    if failedAttempts == maxFailedAttempts:
+      break
 
 printSolution('Best solution', bestSolution)
